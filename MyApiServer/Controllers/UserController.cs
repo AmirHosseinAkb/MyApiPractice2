@@ -1,7 +1,6 @@
 ﻿using Data.Contracts;
 using Entities.User;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using WebFramework.Api;
 using WebFramework.DTOs;
 using WebFramework.ViewModels;
