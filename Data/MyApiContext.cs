@@ -50,20 +50,20 @@ namespace Data
 
         private void _CleanString()
         {
-            var changedEntities = ChangeTracker.Entries()
+            var changedEntries = ChangeTracker.Entries()
                 .Where(e => e.State == EntityState.Modified || e.State == EntityState.Added);
-            foreach (var changedEntity in changedEntities)
+            foreach (var item in changedEntries)
             {
-                var properties = changedEntity.Entity.GetType()
+                var properties = item.Entity.GetType()
                     .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                     .Where(p => p.CanRead && p.CanWrite && p.PropertyType==typeof(string));
                 foreach (var property in properties)
                 {
-                    var propVal =property.GetValue(changedEntity)?.ToString();
+                    string? propVal =property.GetValue(item.Entity)?.ToString();
                     if (!string.IsNullOrEmpty(propVal))
                     {
                         var newVal = propVal.Fa2En().FixPersianChars();
-                        property.SetValue(property, newVal);
+                        property.SetValue(item.Entity, newVal);
                     }
                 }
             }

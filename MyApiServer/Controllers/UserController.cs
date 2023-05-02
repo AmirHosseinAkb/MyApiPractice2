@@ -1,14 +1,18 @@
-﻿using Data.Contracts;
+﻿using System.Net;
+using Data.Contracts;
 using Entities.User;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebFramework.Api;
 using WebFramework.DTOs;
+using WebFramework.Filters;
 using WebFramework.ViewModels;
 
 namespace MyApiServer.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
+    [ApiResultFilter]
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
@@ -32,6 +36,12 @@ namespace MyApiServer.Controllers
                 Gender = user.Gender,
                 Password = user.PasswordHash
             };
+        }
+        [HttpGet]
+        public async Task<ActionResult<List<User>>> GetAll(CancellationToken cancellationToken)
+        {
+            var users =await _userRepository.TableNoTracking.ToListAsync(cancellationToken);
+            return Ok(users);
         }
 
         [HttpPost]
