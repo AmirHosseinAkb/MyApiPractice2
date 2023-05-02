@@ -11,6 +11,9 @@ namespace Data.Repositories
             _context = context;
         }
 
-
+        public Task AddUser(User user, string password, CancellationToken cancellationToken)
+        {
+            var passwordHash=
+        }
     }
 }
