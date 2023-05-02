@@ -1,4 +1,5 @@
-﻿using Data.Contracts;
+﻿using Common.Utilities;
+using Data.Contracts;
 using Entities.User;
 
 namespace Data.Repositories
@@ -11,9 +12,11 @@ namespace Data.Repositories
             _context = context;
         }
 
-        public Task AddUser(User user, string password, CancellationToken cancellationToken)
+        public async Task AddUser(User user, string password, CancellationToken cancellationToken)
         {
-            var passwordHash=
+            var passwordHash = SecurityHelper.HashPasswordSHA256(password);
+            user.PasswordHash = passwordHash;
+            await base.AddAsync(user, cancellationToken);
         }
     }
 }

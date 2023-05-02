@@ -36,11 +36,19 @@ namespace MyApiServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResult<UserViewModel>> Create(UserDto userDto, CancellationToken cancellationToken)
+        public async Task<ApiResult<User>> Create(UserDto userDto, CancellationToken cancellationToken)
         {
             if (await _userRepository.IsExistAsync(u => u.UserName == userDto.UserName,cancellationToken))
                 return BadRequest("نام کاربری تکراری است");
-            await _userRepository.AddAsync()
+            var user = new User()
+            {
+                Age = userDto.Age,
+                FullName = userDto.FullName,
+                Gender = userDto.Gender,
+                UserName = userDto.UserName
+            };
+            await _userRepository.AddUser(user, userDto.Password, cancellationToken);
+            return Ok(user);
         } 
     }
 }

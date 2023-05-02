@@ -1,4 +1,6 @@
 using Data;
+using Data.Contracts;
+using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,12 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<MyApiContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyApiConnection")));
+
+#endregion
+
+#region IOC
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 #endregion
 
