@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using Common.Utilities;
 using Data.Contracts;
 using Entities.Common;
@@ -70,9 +72,19 @@ namespace Data.Repositories
             return await Entities.FindAsync(ids, cancellationToken);
         }
 
+        public virtual async Task<bool> IsExistAsync(Expression<Func<TEntity,bool>> expression, CancellationToken cancellationToken)
+        {
+            return await Entities.AnyAsync(expression, cancellationToken);
+        }
+
         public virtual TEntity GetById(params object[] ids)
         {
             return Entities.Find(ids);
+        }
+
+        public virtual bool IsExist(Expression<Func<TEntity,bool>> expression)
+        {
+            return Entities.Any(expression);
         }
 
         public virtual void Add(TEntity entity, bool saveNow = true)

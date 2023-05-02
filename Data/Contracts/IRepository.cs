@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using Entities.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,8 +20,9 @@ namespace Data.Contracts
         Task UpdateRangeAsync(IEnumerable<TEntity> entities,CancellationToken cancellationToken,bool saveNow=true);
         Task DeleteAsync(TEntity entity, CancellationToken cancellationToken,bool saveNow=true);
         Task DeleteRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken,bool saveNow=true);
-
         Task<TEntity> GetByIdAsync(CancellationToken cancellationToken,params object[] ids);
+
+        Task<bool> IsExistAsync(Expression<Func<TEntity,bool>> expression,CancellationToken cancellationToken);
 
         #endregion
 
@@ -34,7 +36,7 @@ namespace Data.Contracts
 
         TEntity GetById(params object[] ids);
 
-
+        bool IsExist(Expression<Func<TEntity,bool>> expression);
         #endregion
     }
 }
