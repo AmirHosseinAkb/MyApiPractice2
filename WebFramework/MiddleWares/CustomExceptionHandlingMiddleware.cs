@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using WebFramework.Api;
 
@@ -43,26 +44,96 @@ public class CustomExceptionHandlingMiddleware
         catch (AppException exception)
         {
             _logger.LogError(exception, exception.Message);
+
+            apiResultStatusCode = exception.ApiStatusCode;
+            httpStatusCode = exception.HttpStatusCode;
             if (_env.IsDevelopment())
             {
+                var dic = new Dictionary<string, string?>()
+                {
+                    ["Exception"] = exception.Message,
+                    ["StackTrace"] = exception.StackTrace
+                };
+                if (exception.InnerException != null)
+                {
+                    dic.Add("InnerException.Exception", exception.InnerException.Message);
+                    dic.Add("InnerException.StackTrace", exception.InnerException.StackTrace?.ToString());
+                }
 
+                if (exception.AdditionalData != null)
+                    dic.Add("AdditionalData", JsonConvert.SerializeObject(exception.AdditionalData));
+                message = JsonConvert.SerializeObject(dic);
             }
             else
-            {
+                message = exception.Message;
 
-            }
-                var apiResult = new ApiResult(false, exception.StatusCode, exception.Message);
-            var json = JsonConvert.SerializeObject(apiResult);
-            httpContext.Response.ContentType="application/json";
-            await httpContext.Response.WriteAsync(json);
+            await WriteToResponseAsync();
+        }
+
+        catch (UnauthorizedAccessException exception)
+        {
+            _logger.LogError(exception, exception.Message);
+            SetUnAuthorizedAccessException(exception);
+            await WriteToResponseAsync();
+        }
+        catch (SecurityTokenExpiredException exception)
+        {
+            _logger.LogError(exception, exception.Message);
+            SetUnAuthorizedAccessException(exception);
+            await WriteToResponseAsync();
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, exception.Message);
-            var apiresult = new ApiResult(false, ApiResultStatusCode.ServerError, "خطایی رخ داده است");
-            var json = JsonConvert.SerializeObject(apiresult);
+            _logger.LogError(exception,exception.Message);
+            if (_env.IsDevelopment())
+            {
+                var dic = new Dictionary<string, string?>()
+                {
+                    ["Exception"] = exception.Message,
+                    ["StackTrace"] = exception.StackTrace
+                };
+                if (exception.InnerException != null)
+                {
+                    dic.Add("InnerException.Exception", exception.InnerException.Message);
+                    dic.Add("InnerException.StackTrace", exception.InnerException.StackTrace);
+                }
+
+                message = JsonConvert.SerializeObject(dic);
+            }
+
+            await WriteToResponseAsync();
+        }
+
+
+        async Task WriteToResponseAsync()
+        {
+            if (httpContext.Response.HasStarted)
+                throw new InvalidOperationException("The Operation Of Sending Response Has Started");
+            var apiResult = new ApiResult(false, apiResultStatusCode, message);
+            var json = JsonConvert.SerializeObject(apiResult);
+
             httpContext.Response.ContentType="application/json";
+            httpContext.Response.StatusCode = (int) httpStatusCode;
+
             await httpContext.Response.WriteAsync(json);
+        }
+
+        void SetUnAuthorizedAccessException(Exception exception)
+        {
+            apiResultStatusCode = ApiResultStatusCode.UnAuthorized;
+            httpStatusCode = HttpStatusCode.Unauthorized;
+
+            if (_env.IsDevelopment())
+            {
+                var dic = new Dictionary<string, string>()
+                {
+                    ["Exception"] = exception.Message,
+                    ["StackTrace"] = exception.StackTrace
+                };
+                if(exception is SecurityTokenExpiredException securityTokenExpiredException)
+                    dic.Add("Expires",securityTokenExpiredException.Expires.ToString());
+                message = JsonConvert.SerializeObject(dic);
+            }
         }
     }
     
