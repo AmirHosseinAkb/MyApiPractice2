@@ -1,8 +1,10 @@
-﻿using Common;
+﻿using System.Net;
+using Common;
 using Common.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using WebFramework.Api;
 
@@ -19,14 +21,21 @@ public class CustomExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<CustomExceptionHandlingMiddleware> _logger;
-    public CustomExceptionHandlingMiddleware(RequestDelegate next,ILogger<CustomExceptionHandlingMiddleware> logger)
+    private readonly IHostingEnvironment _env;
+    public CustomExceptionHandlingMiddleware(RequestDelegate next,ILogger<CustomExceptionHandlingMiddleware> logger,IHostingEnvironment env)
     {
         _next = next;
         _logger = logger;
+        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext httpContext)
     {
+        string? message = null;
+
+        var apiResultStatusCode = ApiResultStatusCode.ServerError;
+        var httpStatusCode = HttpStatusCode.InternalServerError;
+
         try
         {
             await _next(httpContext);
@@ -34,7 +43,15 @@ public class CustomExceptionHandlingMiddleware
         catch (AppException exception)
         {
             _logger.LogError(exception, exception.Message);
-            var apiResult = new ApiResult(false, exception.StatusCode, exception.Message);
+            if (_env.IsDevelopment())
+            {
+
+            }
+            else
+            {
+
+            }
+                var apiResult = new ApiResult(false, exception.StatusCode, exception.Message);
             var json = JsonConvert.SerializeObject(apiResult);
             httpContext.Response.ContentType="application/json";
             await httpContext.Response.WriteAsync(json);
