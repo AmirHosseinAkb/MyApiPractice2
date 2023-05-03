@@ -1,6 +1,7 @@
 ﻿using Common;
 using Common.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace WebFramework.Api;
 
@@ -57,6 +58,8 @@ public class ApiResult<TData>:ApiResult where TData:class
     {
         Data = data;
     }
+
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public TData Data { get; set; }
 
     #region Implicit Operators
