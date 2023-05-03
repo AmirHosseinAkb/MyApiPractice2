@@ -2,7 +2,7 @@
 {
     public class NotFoundException:AppException
     {
-        public NotFoundException(ApiResultStatusCode statusCode, string message) : base(statusCode, message)
+        public NotFoundException(string message) : base(ApiResultStatusCode.NotFound, message)
         {
         }
     }

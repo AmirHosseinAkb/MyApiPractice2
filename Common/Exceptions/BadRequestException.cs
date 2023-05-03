@@ -2,7 +2,7 @@
 {
     public class BadRequestException:AppException
     {
-        public BadRequestException(ApiResultStatusCode statusCode, string message) : base(statusCode, message)
+        public BadRequestException(string message) : base(ApiResultStatusCode.BadRequest, message)
         {
 
         }

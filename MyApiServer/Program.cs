@@ -2,6 +2,7 @@ using Data;
 using Data.Contracts;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using WebFramework.MiddleWares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
+app.UseCustomExceptionHandlerMiddleware();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

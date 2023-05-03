@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.Exceptions
+﻿namespace Common.Exceptions
 {
-    internal class LogicException
+    public class LogicException:AppException
     {
+        public LogicException(string message) : base(ApiResultStatusCode.LogicError, message)
+        {
+        }
     }
 }
