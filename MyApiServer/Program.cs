@@ -1,4 +1,4 @@
-using System.Text;
+using System.Text;using Common;
 using Data;
 using Data.Contracts;
 using Data.Repositories;
@@ -11,13 +11,14 @@ using WebFramework.Configurations;
 using WebFramework.MiddleWares;
 
 var builder = WebApplication.CreateBuilder(args);
+SiteSettings _siteSettings=builder.Configuration.GetSection(nameof(SiteSettings)).Get<SiteSettings>();
 
 // Add services to the container.
-
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new AuthorizeFilter());
 });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -32,6 +33,7 @@ builder.Services.AddDbContext<MyApiContext>(options =>
 #region IOC
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection(nameof(SiteSettings)));
 
 #endregion
 

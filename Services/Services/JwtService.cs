@@ -16,7 +16,7 @@ namespace Services.Services
         }
         public string Generate(User user)
         {
-            var secretKey = Encoding.UTF8.GetBytes("NewRandomSecurityKey");
+            var secretKey = Encoding.UTF8.GetBytes("NEWRANDOMSECRETKEY");
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey),
                 SecurityAlgorithms.HmacSha256Signature);
 
