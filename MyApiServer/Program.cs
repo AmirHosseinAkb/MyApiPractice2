@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Services.Services;
 using WebFramework.Configurations;
 using WebFramework.MiddleWares;
 
@@ -33,11 +34,12 @@ builder.Services.AddDbContext<MyApiContext>(options =>
 #region IOC
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IJwtService,JwtService>();
 builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection(nameof(SiteSettings)));
 
 #endregion
 
-builder.Services.AddJWTAuthentication();
+builder.Services.AddJWTAuthentication(_siteSettings);
 
 var app = builder.Build();
 

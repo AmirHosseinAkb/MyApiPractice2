@@ -2,6 +2,7 @@
 using Common.Exceptions;
 using Data.Contracts;
 using Entities.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Services.Services;
@@ -47,6 +48,7 @@ namespace MyApiServer.Controllers
             return Ok(users);
         }
 
+        [AllowAnonymous]
         [HttpGet("[action]")]
         public async Task<string> Token(string userName, string password, CancellationToken cancellationToken)
         {
@@ -56,9 +58,8 @@ namespace MyApiServer.Controllers
             return _jwtService.Generate(user);
         }
 
-
-
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ApiResult<User>> Create(UserDto userDto, CancellationToken cancellationToken)
         {
             var user = new User()

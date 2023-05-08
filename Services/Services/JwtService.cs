@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Common;
 using Entities.User;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -9,24 +10,25 @@ namespace Services.Services
 {
     public class JwtService:IJwtService
     {
-        //TODO:Break 15 minutes ....
-        public JwtService()
+        private readonly SiteSettings _siteSettings;
+        public JwtService(IOptionsSnapshot<SiteSettings> siteSettings)
         {
-            
+            _siteSettings = siteSettings.Value;
         }
         public string Generate(User user)
         {
-            var secretKey = Encoding.UTF8.GetBytes("NEWRANDOMSECRETKEY");
+            var secretKey = Encoding.UTF8.GetBytes(_siteSettings.JwtSettings.SecretKey);
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey),
                 SecurityAlgorithms.HmacSha256Signature);
 
             var descriptor = new SecurityTokenDescriptor()
             {
-                Issuer = "Licensify.ir",
-                Audience = "Licensify.ir",
+                Issuer = _siteSettings.JwtSettings.Issuer,
+                Audience = _siteSettings.JwtSettings.Audience,
                 IssuedAt = DateTime.Now,
-                NotBefore = DateTime.Now.AddMinutes(5),
-                Expires = DateTime.Now.AddDays(1),
+                NotBefore =DateTime.Now.AddMinutes(_siteSettings.JwtSettings.NotBeforeMinutes),
+                Expires = DateTime.Now.AddMinutes(_siteSettings.JwtSettings.ExpirationMinutes),
+                Subject = new ClaimsIdentity(_getClaims(user)),
                 SigningCredentials = signingCredentials
             };
             var tokenhandler = new JwtSecurityTokenHandler();
