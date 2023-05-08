@@ -1,9 +1,13 @@
+using System.Text;
 using Data;
 using Data.Contracts;
 using Data.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using WebFramework.Configurations;
 using WebFramework.MiddleWares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,10 +35,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 #endregion
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme=JwtBearerDefaults
-})
+builder.Services.AddJWTAuthentication();
 
 var app = builder.Build();
 
