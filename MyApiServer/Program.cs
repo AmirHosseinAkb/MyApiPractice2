@@ -31,6 +31,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 #endregion
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme=JwtBearerDefaults
+})
+
 var app = builder.Build();
 
 app.UseCustomExceptionHandlerMiddleware();
@@ -42,6 +47,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

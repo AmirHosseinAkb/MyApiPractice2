@@ -16,9 +16,10 @@ namespace Services.Services
         }
         public string Generate(User user)
         {
-            var secretKey = Encoding.UTF8.GetBytes("LicensifyUsers159632874");
+            var secretKey = Encoding.UTF8.GetBytes("NewRandomSecurityKey");
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey),
                 SecurityAlgorithms.HmacSha256Signature);
+
             var descriptor = new SecurityTokenDescriptor()
             {
                 Issuer = "Licensify.ir",
@@ -28,10 +29,9 @@ namespace Services.Services
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = signingCredentials
             };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var securityToken = tokenHandler.CreateToken(descriptor);
-            var jwt = tokenHandler.WriteToken(securityToken);
+            var tokenhandler = new JwtSecurityTokenHandler();
+            var securityToken = tokenhandler.CreateToken(descriptor);
+            var jwt = tokenhandler.WriteToken(securityToken);
             return jwt;
         }
 

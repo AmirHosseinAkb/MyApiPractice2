@@ -1,8 +1,10 @@
 ﻿using System.Net;
+using Common.Exceptions;
 using Data.Contracts;
 using Entities.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Services.Services;
 using WebFramework.Api;
 using WebFramework.DTOs;
 using WebFramework.Filters;
@@ -16,10 +18,11 @@ namespace MyApiServer.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
-
-        public UserController(IUserRepository userRepository)
+        private readonly IJwtService _jwtService;
+        public UserController(IUserRepository userRepository,IJwtService jwtService)
         {
             _userRepository = userRepository;
+            _jwtService = jwtService;
         }
 
         [HttpGet("{id}")]
@@ -43,6 +46,17 @@ namespace MyApiServer.Controllers
             var users =await _userRepository.TableNoTracking.ToListAsync(cancellationToken);
             return Ok(users);
         }
+
+        [HttpGet("[action]")]
+        public async Task<string> Token(string userName, string password, CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetUserByUserNameAndPass(userName, password, cancellationToken);
+            if (user == null)
+                throw new NotFoundException("User Not Found");
+            return _jwtService.Generate(user);
+        }
+
+
 
         [HttpPost]
         public async Task<ApiResult<User>> Create(UserDto userDto, CancellationToken cancellationToken)
